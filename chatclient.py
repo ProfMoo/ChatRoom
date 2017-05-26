@@ -41,16 +41,23 @@ def chat_client():
                     print '\nDisconnected from chat server'
                     sys.exit()
                 else:
-                    # print data
                     sys.stdout.write(data)
-                    sys.stdout.write('[Me] ');
+
+                    if data[0:6] != "Server:" and data[0] != '[':
+                        sys.stdout.write('[Me] ');
+
                     sys.stdout.flush()
 
             else:
                 # user entered a message
                 msg = sys.stdin.readline()
+                print "msg: ", msg
                 s.send(msg)
-                sys.stdout.write('[Me] ');
+
+                #put if for nick here!
+                if msg[0] != '/':
+                    sys.stdout.write('[Me] ');
+
                 sys.stdout.flush()
 
 

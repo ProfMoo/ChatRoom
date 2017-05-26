@@ -13,13 +13,8 @@ PORT = 9009
 stored_names = []
 
 def command(server_socket, sock, data):
-    #print "printing sock name"
-    #socket_name = socket.getsockname()
-    #print socket_name
 
-    print "before: "
-    print stored_names
-
+    #Include any functions here
     datal = data.split(' ')
     if datal[0] == '/changename':
         send_string = "Server: Changing name to " + datal[1]
@@ -28,18 +23,12 @@ def command(server_socket, sock, data):
         i = 0
         while i < len(stored_names):
             if stored_names[i][0] == nickname_to_change:
-                print "datal[1]: ", datal[1]
                 datal[1].replace("\n",'')
-                print "datal[1]: ", datal[1]
                 stored_names[i][1] = datal[1]
-                #print stored_names
-                #print datal
-
             i += 1
-
-    print "after:"
-    print stored_names
-        #print sock.gethostname()
+    else:
+        send_string = "Server: Invalid command\n"
+        sock.send(send_string)
 
 
 def chat_server():
@@ -66,7 +55,6 @@ def chat_server():
                 SOCKET_LIST.append(sockfd)
                 print "Client (%s, %s) connected" % addr
                 stored_names.append([addr[1], ''])
-                print stored_names
 
                 broadcast(server_socket, sockfd, "[%s:%s] entered our chatting room\n" % addr)
 
@@ -78,29 +66,22 @@ def chat_server():
                     data = sock.recv(RECV_BUFFER)
                     if data:
                         # there is something in the socket
-                        print data, '\n'
                         if data[0][0] == "/":
-                            print "ello"
                             command(server_socket, sock, data)
-                            print "guvnah"
 
-                        checknick = (sock.getpeername())[1]
-                        print "checknick: ", checknick
+                        else:
+                            checknick = (sock.getpeername())[1]
+                            nick = False
+                            i = 0
+                            #searches list of stored names and prints the nickname
+                            while i < len(stored_names):
+                                if checknick == stored_names[i][0] and stored_names[i][1] != '':
+                                    broadcast(server_socket, sock, "\r" + '[' + stored_names[i][1][0:-1] + '] ' + data)
+                                    nick = True
+                                i += 1
 
-                        nick = False
-                        i = 0
-                        while i < len(stored_names):
-                            print "i: ", i
-                            if checknick == stored_names[i][0] and stored_names[i][1] != '':
-                                print "hit: "
-                                broadcast(server_socket, sock, "\r" + '[' + stored_names[i][1][0:-1] + '] ' + data)
-                                nick = True
-                            i += 1
-
-                        print "nick: ", nick
-                        if nick == False:
-                            print ("yoo")
-                            broadcast(server_socket, sock, "\r" + '[' + str(sock.getpeername()) + '] ' + data)
+                            if nick == False:
+                                broadcast(server_socket, sock, "\r" + '[' + str(sock.getpeername()) + '] ' + data)
 
                     else:
                         # remove the socket that's broken
