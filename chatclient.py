@@ -4,8 +4,9 @@ import sys
 import socket
 import select
 
-
 def chat_client():
+    self_nick = '[Me] '
+
     if (len(sys.argv) < 3):
         print 'Usage : python chat_client.py hostname port'
         sys.exit()
@@ -44,19 +45,21 @@ def chat_client():
                     sys.stdout.write(data)
 
                     if data[0:6] != "Server:" and data[0] != '[':
-                        sys.stdout.write('[Me] ');
+                        sys.stdout.write(self_nick);
 
                     sys.stdout.flush()
 
             else:
                 # user entered a message
                 msg = sys.stdin.readline()
-                print "msg: ", msg
-                s.send(msg)
 
-                #put if for nick here!
-                if msg[0] != '/':
-                    sys.stdout.write('[Me] ');
+                if msg[0] == '/':
+                    if msg[0:11] == '/changename':
+                        self_nick = ('[Me, (' + msg[12:-1] + ')] ')
+                else:
+                    sys.stdout.write(self_nick)
+
+                s.send(msg)
 
                 sys.stdout.flush()
 

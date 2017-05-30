@@ -26,8 +26,10 @@ def command(server_socket, sock, data):
                 datal[1].replace("\n",'')
                 stored_names[i][1] = datal[1]
             i += 1
+        print "%s changed name to %s" % (nickname_to_change,datal[1][0:-1])
+
     else:
-        send_string = "Server: Invalid command\n"
+        send_string = "Server: Invalid Command\n"
         sock.send(send_string)
 
 
